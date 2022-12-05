@@ -19,19 +19,21 @@ https://docs.google.com/presentation/d/1Ya0JbVkmJigWSELH-VKSDdAfTqxg4Xbb/edit#sl
 2. rechartjs
 */
 
-const getData = () => 
-  Array.from({ length: Math.floor(Math.round(Math.random()) + 2) }).map(_ => Math.ceil(Math.random() * (100 - 10) + 10)).sort((a, b) => b - a);
+const getData = () =>
+  Array.from({ length: Math.floor(Math.round(Math.random()) + 2) })
+    .map((_) => Math.ceil(Math.random() * (100 - 10) + 10))
+    .sort((a, b) => b - a);
 
 const DoughnutDemo: React.FC = memo(() => {
-  const [data, setData] = useState<number[]>(getData())
+  const [data, setData] = useState<number[]>(getData());
 
   const doughnutProps = useMemo(() => {
     return {
       data: data.map((value, index) => ({
         label: `Data ${index + 1}`,
         value,
-        color: ["#1f78b4", "#a6cee3", "#b2df8a"][index]
-      }))
+        color: ["#1f78b4", "#a6cee3", "#b2df8a"][index],
+      })),
     };
   }, [data]);
 

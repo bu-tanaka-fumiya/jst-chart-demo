@@ -1,3 +1,31 @@
 .polygonal {
-  // display: none;
+  margin: 8px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    button {
+      font-size: 16px;
+      height: 100%;
+      margin-left: 8px;
+    }
+  }
+
+  &__chart {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    > div {
+      border: solid 1px #e0e0e0;
+      padding: 8px;
+
+      h2 {
+        font-size: 14px;
+        margin: 4px 8px 0;
+      }
+    }
+  }
 }

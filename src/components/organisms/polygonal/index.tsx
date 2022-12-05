@@ -114,9 +114,7 @@ const getFormatedData = (
         .startOf("date");
     }
   } else {
-    const formatTemplate = `YYYY/MM${
-      timeUnit !== "month" ? `/DD` : ""
-    }`;
+    const formatTemplate = `YYYY/MM${timeUnit !== "month" ? `/DD` : ""}`;
     const minDate = dayjs(DURATION_FROM).startOf(timeUnit);
     const maxDate = dayjs(DURATION_TO).endOf(timeUnit);
     let currentDurationFromDate = minDate;
@@ -147,13 +145,12 @@ const getFormatedData = (
 };
 
 const PolygonalDemo: React.FC = memo(() => {
+  const [allDatas, setAllDatas] = useState([getAllData(), getAllData()]);
 
-  const [allDatas, setAllDatas] = useState([getAllData(), getAllData()])
-  
   const [timeUnit, setTimeUnit] = useState<
     "hour" | "day" | "date" | "week" | "month"
   >("date");
-  const [frontChartIndex, setFrontChartIndex] = useState<number>(1);
+  const [frontChartIndex, setFrontChartIndex] = useState<number>(0);
 
   const polygonalProps = useMemo(() => {
     const { labels, datas } = getFormatedData(allDatas, timeUnit);
@@ -234,19 +231,23 @@ const PolygonalDemo: React.FC = memo(() => {
 
   return (
     <div className="polygonal">
-      <h1>折れ線グラフ</h1>
-      <div>
-        <button onClick={() => setTimeUnit("hour")}>時間</button>
-        <button onClick={() => setTimeUnit("day")}>曜日</button>
-        <button onClick={() => setTimeUnit("date")}>日</button>
-        <button onClick={() => setTimeUnit("week")}>週</button>
-        <button onClick={() => setTimeUnit("month")}>月</button>
+      <div className="polygonal__header">
+        <h1>折れ線グラフ</h1>
+        <div>
+          <button onClick={() => setTimeUnit("hour")}>時間</button>
+          <button onClick={() => setTimeUnit("day")}>曜日</button>
+          <button onClick={() => setTimeUnit("date")}>日</button>
+          <button onClick={() => setTimeUnit("week")}>週</button>
+          <button onClick={() => setTimeUnit("month")}>月</button>
+        </div>
       </div>
       <div className="polygonal__chart">
         <div className="polygonal__chart--1">
+          <h2>react-chartjs-2</h2>
           <ChartjsPolygonal {...polygonalProps} />
         </div>
         <div className="polygonal__chart--2">
+          <h2>recharts</h2>
           <RechartsPolygonal {...polygonalProps} />
         </div>
       </div>

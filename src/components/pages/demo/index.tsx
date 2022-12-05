@@ -31,7 +31,7 @@ const DemoPage: React.FC = memo(() => {
   useEffect(() => {
     history.replaceState(
       null,
-      '',
+      "",
       `?${URL_SEARCH_PARAMS_NAME}=${chartType || "polygonal"}`
     );
   }, [chartType]);

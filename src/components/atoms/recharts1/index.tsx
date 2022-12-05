@@ -58,7 +58,9 @@ const RechartsDoughnut: React.FC<Props> = memo(({ data }) => {
 
   return (
     <div
-      className={`rechartsDoughnut ${!isEmpty ? "rechartsDoughnut--active" : ""}`}
+      className={`rechartsDoughnut ${
+        !isEmpty ? "rechartsDoughnut--active" : ""
+      }`}
     >
       <div className="rechartsDoughnut__title">recharts</div>
       <div

@@ -3,11 +3,14 @@
 // }
 
 .demo {
+  h1 {
+    font-size: 24px;
+  }
 
   &__polygonal {
     // display: none;
   }
-  
+
   &__doughnut {
     display: flex;
 

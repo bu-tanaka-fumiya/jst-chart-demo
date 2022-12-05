@@ -22,7 +22,7 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
   const ref = useRef<ChartJS>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [hoverIndex, setHoverIndex] = useState<number | undefined>(undefined);
-  const [isHover, setIsHover] = useState<boolean>(false)
+  const [isHover, setIsHover] = useState<boolean>(false);
 
   const { isEmpty, values, labels, colors, percentages } = useMemo(() => {
     const all = data.reduce((prev, curr) => prev + curr.value, 0);
@@ -50,22 +50,26 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
       ref.current.clear();
       ref.current.update();
     }
-  }, [data])
+  }, [data]);
 
   useEffect(() => {
     if (hoverIndex !== undefined && !isHover) {
       setActiveIndex(0);
       setHoverIndex(undefined);
-    } 
+    }
     // console.log(isHover)
-  }, [isHover])
+  }, [isHover]);
 
   return (
-    <div className={`chartjsDoughnut ${!isEmpty ? "chartjsDoughnut--active" : ""}`}>
+    <div
+      className={`chartjsDoughnut ${!isEmpty ? "chartjsDoughnut--active" : ""}`}
+    >
       <div className="chartjsDoughnut__title">react-chartjs-2</div>
       <div
         className={`chartjsDoughnut__chart ${
-          hoverIndex !== undefined && !isEmpty ? "chartjsDoughnut__chart--hover" : ""
+          hoverIndex !== undefined && !isEmpty
+            ? "chartjsDoughnut__chart--hover"
+            : ""
         }`}
       >
         <Doughnut
@@ -86,25 +90,28 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
                 //     return ctx.dataIndex === hoverIndex ? 'center' : 'inner'
                 // },
                 weight: 1,
-                ...(!isEmpty ? {
-                  data: values,
-                  backgroundColor: colors,
-                  hoverBorderWidth: 8,
-                  hoverBorderColor: (ctx: any) => {
-                    return Array.isArray(ctx.dataset.backgroundColor)
-                      ? `${ctx.dataset.backgroundColor[ctx.dataIndex]}4D`
-                      : "transparent";
-                  },
-                  hoverBackgroundColor: (ctx: any) => {
-                    return !isEmpty && Array.isArray(ctx.dataset.backgroundColor)
-                      ? `${ctx.dataset.backgroundColor[ctx.dataIndex]}`
-                      : "transparent";
-                  },
-                } : {
-                  data: [1],
-                  backgroundColor: ["#727272"],
-                })
-              }
+                ...(!isEmpty
+                  ? {
+                      data: values,
+                      backgroundColor: colors,
+                      hoverBorderWidth: 8,
+                      hoverBorderColor: (ctx: any) => {
+                        return Array.isArray(ctx.dataset.backgroundColor)
+                          ? `${ctx.dataset.backgroundColor[ctx.dataIndex]}4D`
+                          : "transparent";
+                      },
+                      hoverBackgroundColor: (ctx: any) => {
+                        return !isEmpty &&
+                          Array.isArray(ctx.dataset.backgroundColor)
+                          ? `${ctx.dataset.backgroundColor[ctx.dataIndex]}`
+                          : "transparent";
+                      },
+                    }
+                  : {
+                      data: [1],
+                      backgroundColor: ["#727272"],
+                    }),
+              },
             ],
           }}
           options={{
@@ -119,9 +126,7 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
               setHoverIndex(elements[0] ? elements[0].index : undefined);
             },
             datasets: {
-              doughnut: {
-                
-              },
+              doughnut: {},
             },
             plugins: {
               legend: {
@@ -132,17 +137,31 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
               },
             },
           }}
-          plugins={[{
-            id: 'customEventListner',
-            afterEvent: (chart, evt, opts) => {
-              // console.log(evt.event.type, evt.event.x, evt.event.y, Math.sqrt((SIZE / 2 - evt.event.x) ** 2 + (SIZE / 2 - evt.event.y) ** 2), RADIUS_OUTER)
-              if (typeof evt.event.x === 'number' && typeof evt.event.y === 'number') {
-                // setActiveIndex(0);
-                // setHoverIndex(undefined);
-                setIsHover(Math.sqrt((SIZE / 2 - evt.event.x) ** 2 + (SIZE / 2 - evt.event.y) ** 2) >= RADIUS_INNER && Math.sqrt((SIZE / 2 - evt.event.x) ** 2 + (SIZE / 2 - evt.event.y) ** 2) <= RADIUS_OUTER)
-              }
-            }
-          }]}
+          plugins={[
+            {
+              id: "customEventListner",
+              afterEvent: (chart, evt, opts) => {
+                // console.log(evt.event.type, evt.event.x, evt.event.y, Math.sqrt((SIZE / 2 - evt.event.x) ** 2 + (SIZE / 2 - evt.event.y) ** 2), RADIUS_OUTER)
+                if (
+                  typeof evt.event.x === "number" &&
+                  typeof evt.event.y === "number"
+                ) {
+                  // setActiveIndex(0);
+                  // setHoverIndex(undefined);
+                  setIsHover(
+                    Math.sqrt(
+                      (SIZE / 2 - evt.event.x) ** 2 +
+                        (SIZE / 2 - evt.event.y) ** 2
+                    ) >= RADIUS_INNER &&
+                      Math.sqrt(
+                        (SIZE / 2 - evt.event.x) ** 2 +
+                          (SIZE / 2 - evt.event.y) ** 2
+                      ) <= RADIUS_OUTER
+                  );
+                }
+              },
+            },
+          ]}
         />
         <div className="chartjsDoughnut__chart__label">
           {percentages ? (
@@ -201,4 +220,3 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
 });
 
 export default ChartjsDoughnut;
-// width 42px
