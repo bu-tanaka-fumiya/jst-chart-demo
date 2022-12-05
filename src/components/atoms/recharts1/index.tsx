@@ -3,26 +3,26 @@ import { PieChart, Pie, Sector } from "recharts";
 // styles
 import "./index.scss";
 
-const renderActiveShape = (props) => {
-  const RADIAN = Math.PI / 180;
-  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, midAngle } =
-    props;
-  const sin = Math.sin(-RADIAN * midAngle);
-  const cos = Math.cos(-RADIAN * midAngle);
-  const sx = cx + (outerRadius - 40) * cos;
-  const sy = cy + (outerRadius - 40) * sin;
-  return (
-    <Sector
-      cx={sx}
-      cy={sy}
-      innerRadius={innerRadius}
-      outerRadius={outerRadius}
-      startAngle={startAngle}
-      endAngle={endAngle}
-      fill="red"
-    />
-  );
-};
+// const renderActiveShape = (props) => {
+//   const RADIAN = Math.PI / 180;
+//   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, midAngle } =
+//     props;
+//   const sin = Math.sin(-RADIAN * midAngle);
+//   const cos = Math.cos(-RADIAN * midAngle);
+//   const sx = cx + (outerRadius - 40) * cos;
+//   const sy = cy + (outerRadius - 40) * sin;
+//   return (
+//     <Sector
+//       cx={sx}
+//       cy={sy}
+//       innerRadius={innerRadius}
+//       outerRadius={outerRadius}
+//       startAngle={startAngle}
+//       endAngle={endAngle}
+//       fill="red"
+//     />
+//   );
+// };
 
 type Props = {
   data: {
@@ -94,7 +94,7 @@ const RechartsDoughnut: React.FC<Props> = memo(({ data }) => {
             outerRadius={103}
             startAngle={90}
             endAngle={-270}
-            activeShape={renderActiveShape}
+            // activeShape={renderActiveShape}
             // fill="#8884d8"
             // paddingAngle={0}
             dataKey="value"

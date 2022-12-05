@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Chart as ChartJS, registerables } from "chart.js";
-import { Chart } from "react-chartjs-2";
+import { Chart, Doughnut } from "react-chartjs-2";
 // styles
 import "./index.scss";
 
@@ -68,12 +68,12 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
           hoverIndex !== undefined && !isEmpty ? "chartjsDoughnut__chart--hover" : ""
         }`}
       >
-        <Chart
-          type="doughnut"
+        <Doughnut
+          // type="doughnut"
           height={SIZE}
           width={SIZE}
           // redraw={true}
-          ref={ref}
+          // ref={ref}
           data={{
             labels: labels,
             datasets: [
@@ -90,12 +90,12 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
                   data: values,
                   backgroundColor: colors,
                   hoverBorderWidth: 8,
-                  hoverBorderColor: (ctx) => {
+                  hoverBorderColor: (ctx: any) => {
                     return Array.isArray(ctx.dataset.backgroundColor)
                       ? `${ctx.dataset.backgroundColor[ctx.dataIndex]}4D`
                       : "transparent";
                   },
-                  hoverBackgroundColor: (ctx) => {
+                  hoverBackgroundColor: (ctx: any) => {
                     return !isEmpty && Array.isArray(ctx.dataset.backgroundColor)
                       ? `${ctx.dataset.backgroundColor[ctx.dataIndex]}`
                       : "transparent";
@@ -108,9 +108,6 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
             ],
           }}
           options={{
-            layout: {
-              padding: 7,
-            },
             radius: RADIUS_OUTER,
             cutout: (RADIUS_INNER / RADIUS_OUTER) * 100,
             onHover: (event, elements, chart) => {
@@ -122,7 +119,9 @@ const ChartjsDoughnut: React.FC<Props> = memo(({ data }) => {
               setHoverIndex(elements[0] ? elements[0].index : undefined);
             },
             datasets: {
-              doughnut: {},
+              doughnut: {
+                
+              },
             },
             plugins: {
               legend: {

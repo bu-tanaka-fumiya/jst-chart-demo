@@ -115,7 +115,7 @@ const getFormatedData = (
     }
   } else {
     const formatTemplate = `YYYY/MM${
-      timeUnit !== "month" ? `/DD${timeUnit === "hour" ? " HH" : ""}` : ""
+      timeUnit !== "month" ? `/DD` : ""
     }`;
     const minDate = dayjs(DURATION_FROM).startOf(timeUnit);
     const maxDate = dayjs(DURATION_TO).endOf(timeUnit);

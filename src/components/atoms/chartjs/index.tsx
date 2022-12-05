@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { Chart as ChartJS, registerables } from "chart.js";
+import { Chart as ChartJS, Color, registerables } from "chart.js";
 import { Line } from 'react-chartjs-2';
 // styles
 import './index.scss';
@@ -144,7 +144,7 @@ const ChartjsPolygonal: React.FC<Props> = memo(({ timeUnit, allLabels, allDatase
             },
             displayColors: false,
             backgroundColor: (ctx) => {
-              return ctx.tooltipItems[0]?.dataset.borderColor || 'transparent';
+              return (ctx.tooltipItems[0]?.dataset.borderColor || 'transparent') as Color;
             },
             callbacks: {
               title: (tooltipItems) => {
