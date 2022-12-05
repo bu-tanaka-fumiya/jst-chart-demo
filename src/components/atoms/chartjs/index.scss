@@ -1,0 +1,23 @@
+.chartjsPolygonal {
+  &__legend {
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+
+    &__item {
+      margin-right: 16px;
+      height: fit-content;
+      
+      &__color {
+        display: inline-block;
+        height: 8px;
+        width: 8px;
+        border-radius: 4px;
+        margin: auto 8px auto 0;
+      }
+      &__label {
+        font-size: 16px;
+      }
+    }
+  }
+}

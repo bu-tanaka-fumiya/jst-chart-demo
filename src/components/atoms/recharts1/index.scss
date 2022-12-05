@@ -1,0 +1,115 @@
+.rechartsDoughnut {
+  border: solid 1px #e0e0e0;
+  background-color: #f9f9f9;
+  color: #727272;
+  min-width: 240px;
+  border-radius: 6px;
+  width: fit-content;
+  padding: 8px;
+  user-select: none;
+
+  &--active {
+    background-color: #ffffff;
+    color: #000000de;
+
+    &:hover {
+      background-color: #f8fbff;
+      border-color: #4a8bfb;
+    }
+
+    .rechartsDoughnut__chart--hover {
+      cursor: pointer;
+    }
+  }
+
+  &__title {
+    font-size: 14px;
+    margin: 4px 8px 16px;
+  }
+
+  &__chart {
+    height: fit-content;
+    width: fit-content;
+    position: relative;
+    margin-bottom: 16px;
+
+    &__label {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+
+      height: 86px;
+      width: 86px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      line-height: 14px;
+
+      &__name {
+        margin-bottom: 4px;
+      }
+
+      &__percentage {
+        position: relative;
+
+        &__value {
+          font-size: 28px;
+          line-height: 28px;
+        }
+
+        &__unit {
+          position: absolute;
+          bottom: 0;
+          right: -14px;
+          line-height: 14px;
+        }
+      }
+    }
+  }
+
+  &__legend {
+    &__item {
+      display: flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 4px;
+      position: relative;
+      margin-bottom: 9px;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -5px;
+        height: 1px;
+        width: 100%;
+        background-size: 3px 1px;
+        background-image: linear-gradient(
+          to right,
+          #f2f3f4,
+          #f2f3f4 2px,
+          transparent 2px,
+          transparent 2px
+        );
+        background-repeat: repeat-x;
+      }
+
+      &__color {
+        height: 6px;
+        width: 6px;
+        border-radius: 3px;
+        margin-right: 12px;
+      }
+
+      &__name {
+        margin-right: auto;
+      }
+    }
+  }
+}

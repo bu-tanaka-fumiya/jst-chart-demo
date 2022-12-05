@@ -1,0 +1,18 @@
+// .demo {
+//   background-color: #D2DBE6;
+// }
+
+.demo {
+
+  &__polygonal {
+    // display: none;
+  }
+  
+  &__doughnut {
+    display: flex;
+
+    > div {
+      margin: 16px;
+    }
+  }
+}
