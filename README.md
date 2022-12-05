@@ -1,1 +1,1 @@
-# jstream-admin-web
+# jst-chart-demo
