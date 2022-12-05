@@ -22,7 +22,7 @@ https://docs.google.com/presentation/d/1Ya0JbVkmJigWSELH-VKSDdAfTqxg4Xbb/edit#sl
 */
 
 // const DURATION_FROM = "2020-01-01 00:00:00";
-const DURATION_FROM = "2021-12-01 00:00:00";
+const DURATION_FROM = "2021-11-01 00:00:00";
 const DURATION_TO = "2021-12-31 23:59:59";
 
 const WEEK_BEGINNING_DAY = 0;
