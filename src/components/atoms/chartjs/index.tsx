@@ -23,7 +23,8 @@ type Props = {
   }[];
 };
 
-const POINT_HOVER_RADIUS = 3;
+const POINT_HOVER_RADIUS = 5;
+const POINT_HOVER_BORDER_WIDTH = 1.5;
 
 const CHART_AREA_HEIGHT = 330;
 
@@ -147,10 +148,12 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                 line: {
                   borderWidth: 1,
                   pointRadius: 1,
-                  pointHitRadius: POINT_HOVER_RADIUS * 1.5,
+                  pointHitRadius:
+                    (POINT_HOVER_RADIUS + POINT_HOVER_BORDER_WIDTH) * 1.5,
                   pointBorderWidth: 1,
                   pointBackgroundColor: "#ffffff",
                   pointHoverRadius: POINT_HOVER_RADIUS,
+                  pointHoverBorderWidth: POINT_HOVER_BORDER_WIDTH,
                   pointHoverBackgroundColor: "#ffffff",
                   clip: 10,
                   borderJoinStyle: "bevel",
@@ -247,8 +250,9 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                   if (chart.tooltip._active && chart.tooltip._active.length) {
                     const activePoint = chart.tooltip._active[0];
                     const { ctx } = chart;
-                    const { x } = activePoint.element;
-                    const topY = chart.tooltip.caretY + POINT_HOVER_RADIUS;
+                    const { x, y } = activePoint.element;
+                    const topY =
+                      y + POINT_HOVER_RADIUS + POINT_HOVER_BORDER_WIDTH;
                     const bottomY = chart.scales.y.bottom;
 
                     if (topY < bottomY) {

@@ -142,7 +142,7 @@ const getFormatedData = (
 
 const PolygonalDemo: React.FC = memo(() => {
   const [allDatas, setAllDatas] = useState([
-    getAllData({ min: 150, max: 300 }),
+    getAllData({ min: 1500, max: 3000 }),
     getAllData({ min: 10, max: 20 }),
   ]);
 
