@@ -1,6 +1,12 @@
-import React, { memo, useMemo } from "react";
-import { Chart as ChartJS, Color, registerables } from "chart.js";
-import { Line } from "react-chartjs-2";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Chart as ChartJS,
+  ChartData,
+  ChartArea,
+  Color,
+  registerables,
+} from "chart.js";
+import { Chart } from "react-chartjs-2";
 // styles
 import "./index.scss";
 
@@ -19,79 +25,114 @@ type Props = {
 
 const POINT_HOVER_RADIUS = 3;
 
+const CHART_AREA_HEIGHT = 330;
+
+const createGradient = (
+  ctx: CanvasRenderingContext2D,
+  area: ChartArea,
+  baseColor: string
+) => {
+  const colorStart = `${baseColor}08`;
+  const colorEnd = `${baseColor}80`;
+
+  const gradient = ctx.createLinearGradient(0, area.bottom, 0, area.top);
+
+  gradient.addColorStop(0, colorStart);
+  gradient.addColorStop(1, colorEnd);
+
+  return gradient;
+};
+
 const ChartjsPolygonal: React.FC<Props> = memo(
   ({ timeUnit, allLabels, allDatasets }) => {
-    // const data = useMemo(() => {
-    //   const labels: string[] = []
-    //   const datasets = allDatasets.map(_allDataset => ({
-    //     label: _allDataset.label,
-    //     data: [] as number[],
-    //     borderColor: _allDataset.color,
-    //     backgroundColor: _allDataset.color,
-    //     order: _allDataset.order
-    //   }))
-    //   allLabels.forEach((label, index) => {
-    //     let currentLabel = ''
-    //     if (timeUnit === 'month') {
-    //       currentLabel = dayjs(label).format('YYYY/MM')
-    //     } else if (timeUnit === 'week') {
-    //       currentLabel = `${dayjs(label).format('YYYY/MM')} 第${Math.ceil((dayjs(label).date() + 1) / 7)}週`
-    //     } else if (timeUnit === 'date') {
-    //       currentLabel = dayjs(label).format('YYYY/MM/DD')
-    //     } else if (timeUnit === 'day') {
-    //       currentLabel = dayjs(label).format('YYYY/MM/DD')
-    //     } else {
-    //       currentLabel = dayjs(label).format('YYYY/MM/DD HH:mm:ss')
-    //     }
-    //     if (labels[labels.length - 1] === currentLabel) {
-    //       for (let i = 0; i < datasets.length && i < allDatasets.length; i++) {
-    //         datasets[i].data[datasets[i].data.length - 1] += allDatasets[i].data[index]
-    //       }
-    //     }
-    //     else {
-    //       labels.push(currentLabel)
-    //       for (let i = 0; i < datasets.length && i < allDatasets.length; i++) {
-    //         datasets[i].data.push(allDatasets[i].data[index])
-    //       }
-    //     }
-    //   })
-    //   return {
-    //     labels,
-    //     datasets
-    //   };
-    // }, [timeUnit, allDatasets])
+    const [frontChartIndex, setFrontChartIndex] = useState<number>(0);
 
-    const data = useMemo(() => {
+    const chartRef = useRef<ChartJS>(null);
+
+    const [chartData, setChartData] = useState<
+      ChartData<"line", number[], string>
+    >({
+      labels: [],
+      datasets: [],
+    });
+
+    const data: ChartData<"line", number[], string> = useMemo(() => {
       return {
         labels: allLabels,
-        datasets: allDatasets.map((_allDataset) => ({
+        datasets: allDatasets.map((_allDataset, index) => ({
           label: _allDataset.label,
           data: _allDataset.data,
           borderColor: _allDataset.color,
-          backgroundColor: _allDataset.color,
-          order: _allDataset.order,
+          order: index === frontChartIndex ? 0 : 1,
         })),
       };
-    }, [timeUnit, allLabels, allDatasets]);
+    }, [timeUnit, allLabels, allDatasets, frontChartIndex]);
+
+    useEffect(() => {
+      const chart = chartRef.current;
+
+      if (!chart) {
+        return;
+      }
+
+      const chartData = {
+        ...data,
+        datasets: data.datasets.map((dataset) => {
+          const isFrontData = !dataset.order;
+          return {
+            ...dataset,
+            pointBackgroundColor: isFrontData ? "#ffffff" : dataset.borderColor,
+            // pointBackgroundColor: isFrontData ? "transparent" : `${dataset.borderColor}80`,
+            fill: isFrontData ? true : false,
+            backgroundColor: isFrontData
+              ? createGradient(
+                  chart.ctx,
+                  chart.chartArea,
+                  `${dataset.borderColor}`
+                )
+              : "transparent",
+          };
+        }),
+      };
+
+      setChartData(chartData);
+    }, [data]);
 
     return (
       <>
-        <div className="chartjsPolygonal__legend" style={{ height: 60 }}>
-          {allDatasets.map(({ label, color }, index) => (
-            <span className="chartjsPolygonal__legend__item" key={index}>
-              <span
-                className="chartjsPolygonal__legend__item__color"
-                style={{ backgroundColor: color }}
-              />
-              <span className="chartjsPolygonal__legend__item__label">
-                {label}
+        <div
+          style={{
+            height: 60,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <div className="chartjsPolygonal__legend">
+            {allDatasets.map(({ label, color }, index) => (
+              <span className="chartjsPolygonal__legend__item" key={index}>
+                <span
+                  className="chartjsPolygonal__legend__item__color"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="chartjsPolygonal__legend__item__label">
+                  {label}
+                </span>
               </span>
-            </span>
-          ))}
+            ))}
+          </div>
+          <div className="chartjsPolygonal__button">
+            {allDatasets.map(({ label }, index) => (
+              <button key={index} onClick={() => setFrontChartIndex(index)}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
         <div style={{ marginTop: -60 }}>
-          <Line
-            height={330}
+          <Chart
+            type="line"
+            ref={chartRef}
+            height={CHART_AREA_HEIGHT}
             options={{
               responsive: true,
               interaction: {
@@ -106,11 +147,13 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                 line: {
                   borderWidth: 1,
                   pointRadius: 1,
+                  pointHitRadius: POINT_HOVER_RADIUS * 1.5,
                   pointBorderWidth: 1,
                   pointBackgroundColor: "#ffffff",
                   pointHoverRadius: POINT_HOVER_RADIUS,
                   pointHoverBackgroundColor: "#ffffff",
                   clip: 10,
+                  borderJoinStyle: "bevel",
                 },
               },
               scales: {
@@ -143,6 +186,9 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                 legend: {
                   display: false,
                 },
+                // filler: {
+                //   propagate: false
+                // },
                 tooltip: {
                   yAlign: "bottom",
                   animation: {
@@ -222,7 +268,7 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                 },
               },
             ]}
-            data={data}
+            data={chartData}
           />
         </div>
       </>

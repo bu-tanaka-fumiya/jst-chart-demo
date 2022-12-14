@@ -1723,9 +1723,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jstream-admin-web@workspace:.":
+"jst-chart-demo@workspace:.":
   version: 0.0.0-use.local
-  resolution: "jstream-admin-web@workspace:."
+  resolution: "jst-chart-demo@workspace:."
   dependencies:
     "@faker-js/faker": ^7.6.0
     "@types/react": ^18.0.24

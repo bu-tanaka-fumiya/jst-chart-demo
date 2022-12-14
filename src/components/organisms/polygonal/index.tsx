@@ -27,13 +27,9 @@ const DURATION_TO = "2021-12-31 23:59:59";
 
 const WEEK_BEGINNING_DAY = 0;
 
-const getAllData = () =>
+const getAllData = (range: { min: number; max: number }) =>
   faker.date
-    .betweens(
-      DURATION_FROM,
-      DURATION_TO,
-      faker.datatype.number({ min: 50, max: 200 })
-    )
+    .betweens(DURATION_FROM, DURATION_TO, faker.datatype.number(range))
     .map((date) => ({
       date,
       value: 1,
@@ -145,7 +141,10 @@ const getFormatedData = (
 };
 
 const PolygonalDemo: React.FC = memo(() => {
-  const [allDatas, setAllDatas] = useState([getAllData(), getAllData()]);
+  const [allDatas, setAllDatas] = useState([
+    getAllData({ min: 150, max: 300 }),
+    getAllData({ min: 10, max: 20 }),
+  ]);
 
   const [timeUnit, setTimeUnit] = useState<
     "hour" | "day" | "date" | "week" | "month"
@@ -158,16 +157,16 @@ const PolygonalDemo: React.FC = memo(() => {
       {
         label: "Dataset 1",
         data: datas[0],
-        color: "rgb(255, 99, 132)",
+        color: "#015cfa",
       },
       {
         label: "Dataset 2",
         data: datas[1],
-        color: "rgb(53, 162, 235)",
+        color: "#e53935",
       },
     ].map((allDataset, index) => ({
       ...allDataset,
-      order: index === frontChartIndex ? 1 : 0,
+      order: index === frontChartIndex ? 0 : 1,
     }));
 
     return {

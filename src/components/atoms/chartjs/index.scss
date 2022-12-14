@@ -21,4 +21,18 @@
       }
     }
   }
+
+  &__button {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    margin-top: -25px;
+
+    button {
+      font-size: 16px;
+      height: fit-content;
+      margin-left: 8px;
+      z-index: 100;
+    }
+  }
 }

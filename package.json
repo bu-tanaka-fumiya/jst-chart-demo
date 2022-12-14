@@ -1,15 +1,14 @@
 {
-  "name": "jstream-admin-web",
+  "name": "jst-chart-demo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://bu-tanaka-fumiya.github.io/jst-chart-demo/",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "predeploy": "yarn build",
-    "deploy": "yarn build && gh-pages -d dist"
+    "build": "vite build",
+    "preview": "vite preview --port 8080",
+    "deploy": "yarn build && bash deploy.sh"
   },
   "dependencies": {
     "chart.js": "^3.9.1",
