@@ -1,11 +1,14 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import {
   Chart as ChartJS,
   ChartData,
   ChartArea,
   Color,
   registerables,
+  Interaction,
+  InteractionItem,
 } from "chart.js";
+import { getRelativePosition } from "chart.js/helpers";
 import { Chart } from "react-chartjs-2";
 // styles
 import "./index.scss";
@@ -23,8 +26,11 @@ type Props = {
   }[];
 };
 
+const POINT_RADIUS = 1;
+const POINT_BORDER_WIDTH = 1;
 const POINT_HOVER_RADIUS = 5;
 const POINT_HOVER_BORDER_WIDTH = 1.5;
+const POINT_HIT_RADIUS = POINT_HOVER_RADIUS + POINT_HOVER_BORDER_WIDTH;
 
 const CHART_AREA_HEIGHT = 330;
 
@@ -44,59 +50,117 @@ const createGradient = (
   return gradient;
 };
 
+declare module "chart.js" {
+  interface InteractionModeMap {
+    customPointMode: InteractionModeFunction;
+  }
+}
+
 const ChartjsPolygonal: React.FC<Props> = memo(
   ({ timeUnit, allLabels, allDatasets }) => {
     const [frontChartIndex, setFrontChartIndex] = useState<number>(0);
-
-    const chartRef = useRef<ChartJS>(null);
-
-    const [chartData, setChartData] = useState<
-      ChartData<"line", number[], string>
-    >({
+    const [data, setData] = useState<ChartData<"line", number[], string>>({
       labels: [],
       datasets: [],
     });
-
-    const data: ChartData<"line", number[], string> = useMemo(() => {
-      return {
-        labels: allLabels,
-        datasets: allDatasets.map((_allDataset, index) => ({
-          label: _allDataset.label,
-          data: _allDataset.data,
-          borderColor: _allDataset.color,
-          order: index === frontChartIndex ? 0 : 1,
-        })),
-      };
-    }, [timeUnit, allLabels, allDatasets, frontChartIndex]);
+    const chartRef = useRef<ChartJS>(null);
 
     useEffect(() => {
       const chart = chartRef.current;
 
-      if (!chart) {
-        return;
-      }
+      setData({
+        labels: allLabels,
+        datasets: [
+          ...allDatasets.map((_allDataset, index) => ({
+            label: _allDataset.label,
+            data: _allDataset.data,
+            borderColor: _allDataset.color,
+            pointBorderColor: _allDataset.color,
+            pointHoverBorderColor: _allDataset.color,
+            order: index === frontChartIndex ? 0 : 1,
+            borderWidth: POINT_RADIUS,
+            pointRadius: POINT_BORDER_WIDTH,
+            pointHitRadius: POINT_HIT_RADIUS,
+            pointHoverRadius: POINT_HOVER_RADIUS,
+            pointHoverBorderWidth: POINT_HOVER_BORDER_WIDTH,
+            pointHoverBackgroundColor: "#ffffff",
+            fill: true,
+            ...(chart && index === frontChartIndex
+              ? {
+                  pointBackgroundColor: "#ffffff",
+                  backgroundColor: createGradient(
+                    chart.ctx,
+                    chart.chartArea,
+                    `${_allDataset.color}`
+                  ),
+                }
+              : {
+                  pointBackgroundColor: _allDataset.color,
+                  backgroundColor: "transparent",
+                }),
+          })),
+        ],
+      });
+    }, [timeUnit, allLabels, allDatasets, frontChartIndex]);
 
-      const chartData = {
-        ...data,
-        datasets: data.datasets.map((dataset) => {
-          const isFrontData = !dataset.order;
-          return {
-            ...dataset,
-            pointBackgroundColor: isFrontData ? "#ffffff" : dataset.borderColor,
-            // pointBackgroundColor: isFrontData ? "transparent" : `${dataset.borderColor}80`,
-            fill: isFrontData ? true : false,
-            backgroundColor: isFrontData
-              ? createGradient(
-                  chart.ctx,
-                  chart.chartArea,
-                  `${dataset.borderColor}`
-                )
-              : "transparent",
-          };
-        }),
+    useEffect(() => {
+      Interaction.modes.customPointMode = (
+        chart,
+        event,
+        options,
+        useFinalPosition
+      ) => {
+        const position = getRelativePosition(event, chart);
+        const items: InteractionItem[] = [];
+
+        Interaction.evaluateInteractionItems(
+          chart,
+          "xy",
+          position,
+          (element, datasetIndex, index) => {
+            if (
+              element.inXRange(position.x, useFinalPosition) &&
+              element.inYRange(position.y, useFinalPosition)
+            ) {
+              items.push({ element, datasetIndex, index });
+            }
+          }
+        );
+
+        if (items.length > 1) {
+          let nearestItems: InteractionItem[] = [];
+          let nearestDistance: number = Math.sqrt(
+            (items[0].element.x - position.x) ** 2 +
+              (items[0].element.y - position.y) ** 2
+          );
+
+          items.forEach((item) => {
+            const currentDistance = Math.sqrt(
+              (item.element.x - position.x) ** 2 +
+                (item.element.y - position.y) ** 2
+            );
+            if (nearestDistance > currentDistance) {
+              nearestItems = [item];
+            } else if (nearestDistance === currentDistance) {
+              nearestItems.push(item);
+            }
+          });
+
+          if (nearestItems.length > 1) {
+            return [
+              nearestItems.sort(
+                (a, b) =>
+                  (data.datasets[a.datasetIndex].order || 1) -
+                  (data.datasets[b.datasetIndex].order || 1)
+              )[0],
+            ];
+          }
+
+          return nearestItems;
+        } else {
+          return items;
+        }
       };
-
-      setChartData(chartData);
     }, [data]);
 
     return (
@@ -137,8 +201,8 @@ const ChartjsPolygonal: React.FC<Props> = memo(
             options={{
               responsive: true,
               interaction: {
-                intersect: false,
-                mode: "point",
+                intersect: true,
+                mode: "customPointMode",
               },
               layout: {
                 padding: { top: 80 },
@@ -146,15 +210,8 @@ const ChartjsPolygonal: React.FC<Props> = memo(
               maintainAspectRatio: false,
               datasets: {
                 line: {
-                  borderWidth: 1,
-                  pointRadius: 1,
-                  pointHitRadius:
-                    (POINT_HOVER_RADIUS + POINT_HOVER_BORDER_WIDTH) * 1.5,
                   pointBorderWidth: 1,
                   pointBackgroundColor: "#ffffff",
-                  pointHoverRadius: POINT_HOVER_RADIUS,
-                  pointHoverBorderWidth: POINT_HOVER_BORDER_WIDTH,
-                  pointHoverBackgroundColor: "#ffffff",
                   clip: 10,
                   borderJoinStyle: "bevel",
                 },
@@ -163,8 +220,21 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                 y: {
                   min: 0,
                   grace: "10%",
+                  offset: true,
+                  beginAtZero: true,
                   grid: {
-                    borderDash: [2, 2],
+                    borderDash: (ctx) => {
+                      if (!ctx.index) {
+                        return undefined;
+                      }
+                      return [2, 2];
+                    },
+                    color: (ctx) => {
+                      if (!ctx.index) {
+                        return "#858585";
+                      }
+                      return "#e0e0e0";
+                    },
                     drawBorder: false,
                     drawTicks: false,
                   },
@@ -178,6 +248,7 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                   grid: {
                     display: false,
                     drawTicks: false,
+                    drawBorder: false,
                     borderColor: "#858585",
                   },
                   ticks: {
@@ -186,17 +257,19 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                 },
               },
               plugins: {
+                filler: {
+                  drawTime: "beforeDatasetsDraw",
+                },
                 legend: {
                   display: false,
                 },
-                // filler: {
-                //   propagate: false
-                // },
                 tooltip: {
+                  mode: "customPointMode",
                   yAlign: "bottom",
                   animation: {
                     duration: 0,
                   },
+                  position: "nearest",
                   displayColors: false,
                   backgroundColor: (ctx) => {
                     return (ctx.tooltipItems[0]?.dataset.borderColor ||
@@ -207,29 +280,6 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                       return tooltipItems[0]?.label;
                     },
                     label: (tooltipItem) => {
-                      console.log(tooltipItem, tooltipItem.dataset.label || "");
-                      // return tooltipItem.dataset.order && tooltipItem.dataset.label || ''
-                      if (data.datasets.length > 1) {
-                        const targetDatasets = data.datasets
-                          .map((dataset, index) => ({
-                            label: dataset.label,
-                            datasetIndex: index,
-                            data: dataset.data[tooltipItem.dataIndex],
-                            order: dataset.order,
-                          }))
-                          .filter((dataset) => dataset.data === tooltipItem.raw)
-                          .sort((a, b) => a.order - b.order);
-                        console.log(targetDatasets);
-                        if (targetDatasets.length > 1) {
-                          if (
-                            targetDatasets[0].datasetIndex ===
-                            tooltipItem.datasetIndex
-                          ) {
-                            return tooltipItem.dataset.label || "";
-                          }
-                          return "";
-                        }
-                      }
                       return tooltipItem.dataset.label || "";
                     },
                     footer: (tooltipItems) => {
@@ -253,7 +303,7 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                     const { x, y } = activePoint.element;
                     const topY =
                       y + POINT_HOVER_RADIUS + POINT_HOVER_BORDER_WIDTH;
-                    const bottomY = chart.scales.y.bottom;
+                    const bottomY = chart.scales.y._gridLineItems[0].ty1;
 
                     if (topY < bottomY) {
                       ctx.save();
@@ -272,7 +322,7 @@ const ChartjsPolygonal: React.FC<Props> = memo(
                 },
               },
             ]}
-            data={chartData}
+            data={data}
           />
         </div>
       </>

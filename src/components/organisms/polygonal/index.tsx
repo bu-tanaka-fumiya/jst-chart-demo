@@ -164,6 +164,11 @@ const PolygonalDemo: React.FC = memo(() => {
         data: datas[1],
         color: "#e53935",
       },
+      // {
+      //   label: "Dataset 3",
+      //   data: datas[2],
+      //   color: "#b2df8a",
+      // },
     ].map((allDataset, index) => ({
       ...allDataset,
       order: index === frontChartIndex ? 0 : 1,
